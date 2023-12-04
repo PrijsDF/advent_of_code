@@ -3,7 +3,7 @@ with open("2023/3/input.txt") as f:
 
 #input = [[char for char in line.strip()][:10] for line in input[2:4]]
 input = [[char for char in line.strip()] for line in input]
-input = input[:2]
+#input = input[:2]
 # input = [[char for char in line.strip()] for line in input]
 
 # num_set = {'0', '1', '2', '3', '4',
@@ -85,8 +85,15 @@ for i, line in enumerate(input):
             current_num = ''
             valid_num = False
 
-    # We have finished the current line; check if current_num 
-    # contains a num and if so store it
-    #print(current_num)
+    # At the end of iterating over a row (i); we need to check whether
+    # there still is an unsaved current_num that is valid; if so,
+    # we need to process it before we move to the next row, because 
+    # otherwise it gets next digits on the new i appended and ugly things happen
+    if current_num and valid_num:
+        print(f'{i}:{j}, {current_num}')
+        sum_of_nums += int(current_num) 
+
+    current_num = ''
+    valid_num = False
 
 print(sum_of_nums)
