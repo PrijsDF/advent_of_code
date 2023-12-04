@@ -1,14 +1,10 @@
 with open("2023/2/input.txt") as f:
     input = f.readlines()
 
-maxes = {
-    'red': 12,
-    'green': 13,
-    'blue': 14
-}
+maxes = {"red": 12, "green": 13, "blue": 14}
 
 # Split the games and remove unnecessary punctuation
-input = [line.replace(',', '').replace(';', '').strip().split(' ') for line in input]
+input = [line.replace(",", "").replace(";", "").strip().split(" ") for line in input]
 
 # Store ans for part 1 of question
 sum_of_ids = 0
@@ -18,16 +14,12 @@ sum_of_powers = 0
 
 for game in input:
     game_id = int(game[1][:-1])
-    
+
     # Keep track of whether the game counts as valid
     valid_game = True
 
-    # Keep track of fewest number of cubes needed 
-    min_mapping = {
-        'red': 0,
-        'blue': 0,
-        'green': 0    
-    }
+    # Keep track of fewest number of cubes needed
+    min_mapping = {"red": 0, "blue": 0, "green": 0}
 
     # Parse the rest of the game values into a useful object
     # We still have to discard every second result though
@@ -42,7 +34,7 @@ for game in input:
             # Check if the count violates the max allowed
             if count > maxes[color]:
                 valid_game = False
-            
+
             # Update the min. required number of cubes if needed
             if count > min_mapping[color]:
                 min_mapping[color] = count
@@ -52,7 +44,7 @@ for game in input:
         sum_of_ids += game_id
 
     # Compute power of the set of min. required number of cubes
-    power = min_mapping['red'] * min_mapping['blue'] * min_mapping['green'] 
+    power = min_mapping["red"] * min_mapping["blue"] * min_mapping["green"]
 
     # Add the found value to the sum of powers (part two of the question)
     sum_of_powers += power
