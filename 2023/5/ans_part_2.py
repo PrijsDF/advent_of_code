@@ -63,7 +63,9 @@ next_map_map = {
 for map, rules in almanac.items():
     if map == 'final_map':
         break
-
+    
+    print(f'Starting with map {map}')
+    
     current_ranges = almanac_ranges[map].copy()
     next_map = next_map_map[map]
 
