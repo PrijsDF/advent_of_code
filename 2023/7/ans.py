@@ -15,21 +15,42 @@ high card
 """
 
 # We use a card map to be able to sort on the hand later 
-card_map = {
-    "A": "a",
-    "K": "b", 
-    "Q": "c", 
-    "J": "d", 
-    "T": "e", 
-    "9": "f", 
-    "8": "g", 
-    "7": "h", 
-    "6": "i", 
-    "5": "j", 
-    "4": "k", 
-    "3": "l", 
-    "2": "m"     
-}
+solve_part = 2
+if solve_part == 1:
+    card_map = {
+        "A": "a",
+        "K": "b", 
+        "Q": "c", 
+        "J": "d", 
+        "T": "e", 
+        "9": "f", 
+        "8": "g", 
+        "7": "h", 
+        "6": "i", 
+        "5": "j", 
+        "4": "k", 
+        "3": "l", 
+        "2": "m"     
+    }
+else:
+    card_map = {
+        "A": "a",
+        "K": "b", 
+        "Q": "c", 
+        "T": "e", 
+        "9": "f", 
+        "8": "g", 
+        "7": "h", 
+        "6": "i", 
+        "5": "j", 
+        "4": "k", 
+        "3": "l", 
+        "2": "m",
+        "J": "n"     
+    }
+
+# In case we need to reverse map a card
+reverse_map = {value:key for key, value in card_map.items()}
 
 def get_score(hand):
     """
@@ -39,25 +60,57 @@ def get_score(hand):
     full house == 5
     three of a kind == 4
     two pair == 3
-    one par == 2
+    one pair == 2
     high card == 1
     """
-    # Get the cards
+    # Get the counts of each card in the hand
     cards = {mapped_card:0 for mapped_card in card_map.values()}
     for card in hand:
         cards[card] += 1
-
     
     # Get the doubles
     nums_of_kinds = {
         5: 0,
         4: 0,
         3: 0,
-        2: 0
+        2: 0,
+        1: 0
     }
     for card, count in cards.items():
-        if count > 1:
+        if count > 0 and card != 'n':
             nums_of_kinds[count] += 1
+
+    # We alter the nums_of_kinds, depending on how many jokers we have 
+    n_jokers = cards["n"]
+    if n_jokers == 4 or n_jokers == 5:
+        nums_of_kinds[5] += 1
+    elif n_jokers == 3: 
+        if nums_of_kinds[2] == 1:
+            # So if we already have 2 of a kind and 3 jokers, we know we get 5 of a kinda
+            nums_of_kinds[5] += 1
+        elif nums_of_kinds[1] == 2:
+            nums_of_kinds[4] += 1
+    elif n_jokers == 2:
+        if nums_of_kinds[3] == 1:
+            nums_of_kinds[5] += 1
+        elif nums_of_kinds[2] == 1:
+            nums_of_kinds[4] += 1
+        elif nums_of_kinds[1] == 3:
+            # In this case each other num is unique
+            nums_of_kinds[3] += 1
+    elif n_jokers == 1:
+        if nums_of_kinds[4] == 1:
+            nums_of_kinds[5] += 1
+        elif nums_of_kinds[3] == 1:
+            nums_of_kinds[4] += 1
+        elif nums_of_kinds[2] > 0:
+            # This will either give us a three of a kind, or a full house (with 2 pairs already there)
+            # We do have to remove 1 pair from the counts though, otherwise we might count a full house
+            # if there was only one pair there
+            nums_of_kinds[3] += 1
+            nums_of_kinds[2] -=1
+        elif nums_of_kinds[1] > 0:
+            nums_of_kinds[2] += 1
 
     # Decide on the score
     if nums_of_kinds[5] == 1:
@@ -94,6 +147,9 @@ for score in range(7, 0, -1):
     hands_with_score = hand_scores[score]
 
     if hands_with_score:
+        # Add the score back for debugging purposes
+        hands_with_score = [hand + [score] for hand in hands_with_score]
+
         final_order += sorted(hands_with_score, key=lambda x: x[0])
 
 len_final_order = len(final_order)
