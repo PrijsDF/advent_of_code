@@ -10,7 +10,7 @@ with open(f"2023/8/{input_map[input]}") as f:
 steps = [*input[0].strip()]
 print(steps)
 node_map = {}
-start_node = None
+
 for i in range(2, len(input)):
     line = input[i]
     line_parts = line.split('=')
@@ -21,12 +21,6 @@ for i in range(2, len(input)):
 
     node_map[f'{current_node}L'] = left_next_node
     node_map[f'{current_node}R'] = right_next_node
-
-    # We need the start and end node to know where to start and when we are done
-    if i == 2:
-        start_node = current_node
-    if i == len(input) - 1:
-        end_node = current_node
 
 start_node = 'AAA'
 end_node = 'ZZZ'
