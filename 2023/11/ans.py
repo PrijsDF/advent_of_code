@@ -1,4 +1,4 @@
-data = 1
+data = 2
 solve_part = 2
 data_map = {
     1: "intro_input.txt", 
@@ -23,49 +23,46 @@ for i in range(n_rows):
             empty_i[i] = 0
             empty_j[j] = 0
 
-# Expand the universe, first rows then cols
+# We prep the expansion by marking which rows and cols are empty with '@'s
 for i in range(len(empty_i)-1, -1, -1):
     if empty_i[i] == 1:
-        universe.insert(i, ['.'] * n_cols)
+        universe[i] = ['@'] * n_cols
 
 # We have to reset the number of rows, as it has expanded 
 n_rows = len(universe)
 for j in range(len(empty_j)-1, -1, -1):
     if empty_j[j] == 1:
         for i in range(n_rows):
-            universe[i].insert(j, '@')
+            universe[i][j] = '@'
 
 # Reset the number of cols in case we need it
 n_cols = len(universe[0])
 
 # Find the galaxies in the expanded universe
 galaxy_coords = []
-# These shadow i and j will keep track of the real expansion (part two)
+# To account for universe expansion, we will use shadow i and j vars. These will store the 
+# 'real' coordinates of an galaxy as they are increased with the necessary expansion per encountered '@'
 shadow_i = 0
-shadow_j = 0
 for i in range(n_rows):
-    # We only want to update shadow_i once per row
-    if universe[i][0] == '@':
-        shadow_i += 1000000
-    else:
-        shadow_i += 1
-
+    shadow_j = 0
     for j in range(n_cols):
-        # We only want to update shadow_j once per col, so we only do the check
-        # for the final element in the col
-        if j == n_cols - 1 and universe[i][j] == '@':
-            shadow_j += 1000000
-        else:
-            shadow_j += 1
-
         if universe[i][j] == '#':
             if solve_part == 1:
                 galaxy_coords.append((i, j))
             else:
                 galaxy_coords.append((shadow_i, shadow_j))
 
-#for t in universe:
-#    print(t)
+        # They shadow increments need to happen after the current i,j was checked
+        if universe[i][j] == '@':
+            shadow_j += 1000000
+        else:
+            shadow_j += 1
+
+    # We only want to update shadow_i once per row
+    if universe[i][0] == '@':
+        shadow_i += 1000000
+    else:
+        shadow_i += 1
 
 # Find the distances between the galaxies
 total_distance = 0
