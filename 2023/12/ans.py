@@ -1,9 +1,14 @@
-data = 1
+from functools import cache
+import time
+
+
+data = 4
 solve_part = 2
 data_map = {
     1: "intro_input.txt", 
     2: "intro_input2.txt", 
-    3: "input.txt"
+    3: "intro_input3.txt", 
+    4: "input.txt"
 }
 with open(f"2023/12/{data_map[data]}") as f:
     lines = f.readlines()
@@ -24,34 +29,39 @@ def is_valid_placement(springs, seq_len, i, first_seq):
     return False
 
 
+@cache
 def solve_springs(springs, seq_lens, depth, i):
-   for j in range(i, len(springs)):
-      first_seq = True if depth == 0 else False
-      if is_valid_placement(springs, seq_lens[depth], j, first_seq):
-         new_springs = springs[:j] + ['#'] * seq_lens[depth] + springs[j+seq_lens[depth]:]
-         #print(f'depth: {depth}, seqlen: {seq_lens[depth]}, j: {j}, {springs}')
+    count = 0
+    for j in range(i, len(springs)):
+        #first_seq = True if depth == 0 else False
+        if is_valid_placement(springs, seq_lens[depth], j, True if depth == 0 else False):
+            new_springs = springs[:j] + '#' * seq_lens[depth] + springs[j+seq_lens[depth]:]
 
-         if depth < len(seq_lens)-1:
-            solve_springs(new_springs, seq_lens, depth + 1, j + 1)
-         else:
-            new_groups = ''.join(new_springs).replace('?', '.').replace('.', ' ').split() 
-            if len(new_groups) == depth+1:
-               #print(f"Final, valid sequence: {new_springs}")
-               global sum_of_valid_arrangements 
-               sum_of_valid_arrangements += 1
+            if depth < len(seq_lens)-1:
+                count += solve_springs(new_springs, seq_lens, depth + 1, j + 1)
+            else:
+                new_groups = ''.join(new_springs).replace('?', '.').replace('.', ' ').split() 
+                if len(new_groups) == depth+1:
+                    #print(f"Final, valid sequence: {new_springs}")
+                    count += 1
+
+    return count
 
 
-sum_of_valid_arrangements = 0
+sum_of_num = 0
+start_time = time.time()
 for i, line in enumerate(lines):
-   line_parts = line.strip().split()
-   springs = [char for char in line_parts[0]]
-   seq_lens = [int(num) for num in line_parts[1].split(',')] 
+    line_parts = line.strip().split()
+    springs = line_parts[0]
+    seq_lens = tuple(int(num) for num in line_parts[1].split(','))
 
-   if solve_part == 2:
-      springs = springs + ['?'] + springs + ['?'] + springs + ['?'] + springs + ['?'] + springs
-      seq_lens *= 5
+    if solve_part == 2:
+        springs = springs + '?' + springs + '?' + springs + '?' + springs + '?' + springs
+        seq_lens *= 5
 
-   print(f'Starting {i+1}/{len(lines)}: {line.strip()}')
-   solve_springs(springs, seq_lens, 0, 0)
+    #print(f'Starting {i+1}/{len(lines)}: {line.strip()}')
+    line_start_time = time.time()
+    sum_of_num += solve_springs(springs, seq_lens, 0, 0)
+    print(f'Finished {i+1}/{len(lines)}: {line.strip()} in {time.time() - line_start_time:.2f} seconds')
 
-print(sum_of_valid_arrangements)
+print(f'Recursively found {sum_of_num} arrangements in {time.time() - start_time:.2f} seconds')
